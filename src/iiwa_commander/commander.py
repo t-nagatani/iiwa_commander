@@ -26,11 +26,9 @@ class Commander:
 
     def callback(self, msg):
         self.__isReached = self.distanceToGoal(msg.pose,self.__requestPose.pose) < 0.02
-        pass
 
     def distanceToGoal(self, start, goal):
         distance = (start.position.x-goal.position.x)**2 + \
         (start.position.y-goal.position.y)**2 + \
         (start.position.z-goal.position.z)**2
-        print distance
         return distance
