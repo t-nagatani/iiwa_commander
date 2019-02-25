@@ -10,7 +10,9 @@ if __name__ == "__main__":
     commander = Commander()
     rate = rospy.Rate(0.5)
     while not rospy.is_shutdown():
+        commander.open()
         commander.run(0.430263417065, 0.67638813524, -0.0312535715088)
         rate.sleep()
+        commander.close()
         commander.run(0.530263417065, 0.67638813524, -0.0312535715088)
         rate.sleep()

@@ -7,11 +7,11 @@ from std_msgs.msg import Int32
 
 class Commander:
     def __init__(self):
-        self.__pub = rospy.Publisher('/iiwa/command/CartesianPose', PoseStamped, queue_size=10)
+        self.__pub = rospy.Publisher('/iiwa/command/CartesianPose', PoseStamped, queue_size=10, latch=True)
         self.__sub = rospy.Subscriber('/iiwa/state/CartesianPose', PoseStamped, self.callback)
         self.__requestPose=PoseStamped()
         self.__isReached=False
-        self.__sakePub = rospy.Publisher('sake_command', Int32, queue_size=10)
+        self.__sakePub = rospy.Publisher('sake_command', Int32, queue_size=10, latch=True)
         self.__sakeSub = rospy.Subscriber('sake_state', Int32, self.sakeCallback)
         self.__sakeStatus = 0
 
@@ -39,6 +39,7 @@ class Commander:
         msg = Int32()
         msg.data = 1
         self.__sakePub.publish(msg)
+        print "publish"
         while self.__sakeStatus == 0 and (not rospy.is_shutdown()):
             pass
 
