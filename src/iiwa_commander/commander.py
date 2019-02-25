@@ -3,6 +3,7 @@
 
 import rospy
 from geometry_msgs.msg import PoseStamped, Quaternion
+from std_msgs.msg import Int32
 
 class Commander:
     def __init__(self):
@@ -10,6 +11,9 @@ class Commander:
         self.__sub = rospy.Subscriber('/iiwa/state/CartesianPose', PoseStamped, self.callback)
         self.__requestPose=PoseStamped()
         self.__isReached=False
+        self.__sakePub = rospy.Publisher('sake_command', Int32, queue_size=10)
+        self.__sakeSub = rospy.Subscriber('sake_state', Int32, self.sakeCallback)
+        self.__sakeStatus = 0
 
     def run(self, x, y, z):
         pose = PoseStamped()
@@ -24,6 +28,20 @@ class Commander:
         while (not self.__isReached) and (not rospy.is_shutdown()):
             pass
 
+    def close(self):
+        msg = Int32()
+        msg.data = 0
+        self.__sakePub.publish(msg)
+        while self.__sakeStatus == 1 and (not rospy.is_shutdown()):
+            pass
+
+    def open(self):
+        msg = Int32()
+        msg.data = 1
+        self.__sakePub.publish(msg)
+        while self.__sakeStatus == 0 and (not rospy.is_shutdown()):
+            pass
+
     def callback(self, msg):
         self.__isReached = self.distanceToGoal(msg.pose,self.__requestPose.pose) < 0.02
 
@@ -32,3 +50,6 @@ class Commander:
         (start.position.y-goal.position.y)**2 + \
         (start.position.z-goal.position.z)**2
         return distance
+
+    def sakeCallback(self, msg):
+        self.__sakeStatus = msg.data
